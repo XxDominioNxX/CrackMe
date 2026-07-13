@@ -1,32 +1,51 @@
-- Попытка ввода случайного ключа
-<img width="506" height="522" alt="image" src="https://github.com/user-attachments/assets/d8e16461-4fc2-4172-a438-8e1bc92c802d" />
+-	Запуск производился на эмуляторе с root-правами
+-	Открыл .apk в jadx
+-	Исследуя код, выявлены следующие методы защиты:
+MainActivity: 
+verifyLibs() – проверка целостности загружаемых библиотек и classes.dex
+onCreate() – isDebuggerConnected, RootDetection
 
-- Открыл .apk в jadx
-- В MainActivity проверка вводимого значения выполняется в классе CodeCheck
-<img width="396" height="204" alt="image" src="https://github.com/user-attachments/assets/017d2db6-7cbd-4b7e-9ff5-542921fcc488" />
+-	Так же в MainActivity найдена строка, которая скорее всего пригодится: 
+private static final String xorkey = "pizzapizzapizzapizzapizz";
 
-- Функция bar объявлена с модификатором native. Это означает, что её реализация написана не на Java, а на языке C/C++ и находится в нативной библиотеке (.so файле), которая подгружается в MainActivity
-<img width="1017" height="342" alt="image" src="https://github.com/user-attachments/assets/df45450e-275a-45e9-91d2-8fe826d22d5c" />
+-	При провале любой проверки выполняется ShowDialog и приложение закрывается
+-	Патч .apk
+<img width="766" height="183" alt="image" src="https://github.com/user-attachments/assets/6d73b13f-e466-4744-8616-2f15e53b530d" />
+-	Теперь можно искать флаг. Проверка вводимого значения производится в классе CodeCheck -> bar (native из libfoo.so)
+-	Расспаковал .apk, нашел libfoo.so для нужной в моем случае архитектуры и открыл в Ida Pro
+-	Найдена функция проверки bar
+<img width="673" height="122" alt="image" src="https://github.com/user-attachments/assets/e01f96bf-f162-4734-9bf1-b83f25383b60" />
+Вот ее содержимое
+<img width="974" height="527" alt="image" src="https://github.com/user-attachments/assets/6a148342-420e-48cc-8f34-ff05cca784a1" />
+Переименованы для удобства. Видна проверка по длине 24. 
+Далее производится проверка вида: input == secret ^ key по 3 байта
+- secret_data заполняется из функции sub_12C0. Внутри много повторяющегося бесполезного кода – это обфускация. 
+Обфускации: 
+<img width="622" height="413" alt="image" src="https://github.com/user-attachments/assets/c6241aa6-e505-41f1-9848-5c7bf7d788dc" />
+<img width="931" height="1163" alt="image" src="https://github.com/user-attachments/assets/581dcd68-b4bb-42e5-97bb-2edced64df57" />
+Важные строки в конце
+<img width="741" height="278" alt="image" src="https://github.com/user-attachments/assets/adc4c8b1-084e-4958-9984-b16dcbc60ffc" />
+Secret_data состоит из двух частей:
+Первая (16 байт) в переменной xmmword_3B40
+<img width="974" height="78" alt="image" src="https://github.com/user-attachments/assets/f626d006-c9ca-4d6a-99f1-df06760b681d" />
+Вторая (8 байт) добавляется константой 0x14130817005A0E08LL (hex: 0x14130817005A0E08) 
+Разворачиваем байты и получаем
+Итог: 1d0811130f1749150d0003195a1d1315080e5a0017081314 (24 байта)
 
-- Распаковал .apk как архив. Нашел библиотеку в по пути /lib/x86/libfoo.so
-- Открыл libfoo.so в Ida Pro
-- В окне функций нашел подходящую по имени Java_sg_vantagepoint_uncrackable2_CodeCheck_bar
-<img width="427" height="117" alt="image" src="https://github.com/user-attachments/assets/b8fba010-96d4-4d4a-a901-7bccddc7119f" />
+var encodedHex = "1d0811130f1749150d0003195a1d1315080e5a0017081314";
+var xorKey = "pizzapizzapizzapizzapizzapizza";
 
-Вот ее содержимое полученное через Hex-Rays:
-<img width="950" height="512" alt="image" src="https://github.com/user-attachments/assets/69521007-5c75-40ae-a0c6-05c42afea54f" />
+var encoded = Convert.FromHexString(encodedHex);
+var keyBytes = Encoding.UTF8.GetBytes(xorKey);
 
+var secret = Encoding.UTF8.GetString(
+    [.. encoded.Select((b, i) => (byte)(b ^ keyBytes[i % keyBytes.Length]))]
+);
 
-- Видно сравнение длины входного аргумента со значениемм 23 (Предположительно длина)
-- Далее сравнение входного аргумента strncmp со значениями в переменных типа int
-- Изменил тип s2 (Начало данных) c "int s2" на "char s2 [23]"
-<img width="736" height="402" alt="image" src="https://github.com/user-attachments/assets/f67bdf67-154a-4b21-9a19-0ae546e36f2e" />
-
-- Вот вид функции после редактирования:
-<img width="907" height="416" alt="image" src="https://github.com/user-attachments/assets/de689e5a-c4f6-4caa-873a-3d43ae41c78b" />
-
-- Флаг "Thanks for all the fish"!
-- Проверка в эмуляторе
-<img width="540" height="537" alt="image" src="https://github.com/user-attachments/assets/c794abbe-e7a9-44ae-9866-79328084affa" />
+Console.WriteLine($"Secret: {secret}");
 
 
+making owasp great again
+
+Проверка
+<img width="588" height="784" alt="image" src="https://github.com/user-attachments/assets/dc5962b6-d941-4283-be8f-4af14709f2ac" />
