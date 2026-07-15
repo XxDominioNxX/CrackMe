@@ -1,7 +1,19 @@
-- Открыл файл в jadx
-- Нашел класс, который используется для сравнения вводимого значения с строкой флагом:
-<img width="1202" height="401" alt="image" src="https://github.com/user-attachments/assets/96aa7eae-b0ea-4741-bcbc-c31176d62579" />
-- Видны зашифрованная строка обернутая в base64 и строка для получения ключа
+## Shopping cart
+```
+Flag: "NEW2019"
+```
 
-- Флаг: "I want to believe"
-<img width="646" height="788" alt="image" src="https://github.com/user-attachments/assets/189d1b4c-e602-417c-a0e8-c22ceeaf1f2c" />
+
+## AI Chat
+```
+Flag: "sk-abcdef1234567890abcdef1234567890abcdef12"
+```
+
+
+## CloudServices
+AWS S3 Buckets
+```
+String aws_access_key_id = "AKIAX56QKKOLPQ7G7ABC";
+String aws_secret_access_key = "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";
+String region = "ap-south-2";
+```
