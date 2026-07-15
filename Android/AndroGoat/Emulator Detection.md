@@ -1,19 +1,5 @@
-## Shopping cart
 ```
-Flag: "NEW2019"
-```
-
-
-## AI Chat
-```
-Flag: "sk-abcdef1234567890abcdef1234567890abcdef12"
+frida -U --codeshare cubetech126/root-and-emulator-detection-bypass -f owasp.sat.agoat
 ```
 
-
-## CloudServices
-AWS S3 Buckets
-```
-String aws_access_key_id = "AKIAX56QKKOLPQ7G7ABC";
-String aws_secret_access_key = "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";
-String region = "ap-south-2";
-```
+<img width="514" height="655" alt="image" src="https://github.com/user-attachments/assets/1d7e05f6-64c2-4c6e-a908-e8d9a20780e3" />
