@@ -1,7 +1,15 @@
-- Открыл файл в jadx
-- Нашел класс, который используется для сравнения вводимого значения с строкой флагом:
-<img width="1202" height="401" alt="image" src="https://github.com/user-attachments/assets/96aa7eae-b0ea-4741-bcbc-c31176d62579" />
-- Видны зашифрованная строка обернутая в base64 и строка для получения ключа
+### Запуск на рутованном устройстве
 
-- Флаг: "I want to believe"
-<img width="646" height="788" alt="image" src="https://github.com/user-attachments/assets/189d1b4c-e602-417c-a0e8-c22ceeaf1f2c" />
+<img width="417" height="473" alt="image" src="https://github.com/user-attachments/assets/e564ff66-61f2-4daa-87bd-65418256b5a3" />
+
+
+
+
+```
+frida -U --codeshare Q0120S/root-detection-bypass -f owasp.sat.agoat
+```
+
+<img width="455" height="570" alt="image" src="https://github.com/user-attachments/assets/4d39484b-4d2c-4c0e-b581-0948a265d6ff" />
+
+
+
